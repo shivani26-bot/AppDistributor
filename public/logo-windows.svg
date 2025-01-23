@@ -1,0 +1,14 @@
+<svg width="38" height="38" viewBox="0 0 38 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>windows</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-11818 -8670)">
+<g id="windows">
+<g id="&#238;&#158;&#130;">
+<use xlink:href="#path0_fill" transform="translate(11818 8670.5)" fill="#1BA5EC"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" fill-rule="evenodd" d="M 0 17.5L 0 5.23438L 15 3.14453L 15 17.5L 0 17.5ZM 17.5 2.79297L 37.5 0L 37.5 17.5L 17.5 17.5L 17.5 2.79297ZM 17.5 34.707L 17.5 20L 37.5 20L 37.5 37.5L 17.5 34.707ZM 0 32.2656L 0 20L 15 20L 15 34.3555L 0 32.2656Z"/>
+</defs>
+</svg>
