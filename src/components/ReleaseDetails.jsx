@@ -54,15 +54,20 @@ const data = [
     goal: 349,
   },
 ];
+
 const ReleaseDetails = ({ isReleaseDetailsVisible, releaseData }) => {
-  const [isOpen, setIsOpen] = React.useState(isReleaseDetailsVisible);
+  const [goal, setGoal] = React.useState(350);
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
-    setIsOpen(isReleaseDetailsVisible);
+    setOpen(isReleaseDetailsVisible); // Set the drawer open state based on the prop
   }, [isReleaseDetailsVisible]);
-
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    // <Drawer>
+    <Drawer open={open} onOpenChange={setOpen}>
+      {/* <DrawerTrigger asChild>
+        <Button variant="outline">Open Drawer</Button>
+      </DrawerTrigger> */}
       <DrawerContent>
         <div className="  mx-auto w-full ">
           <DrawerHeader>
@@ -77,6 +82,9 @@ const ReleaseDetails = ({ isReleaseDetailsVisible, releaseData }) => {
               <h3 className="text-xl font-semibold">
                 File Extension: {releaseData.fileExtension}
               </h3>
+            </div>
+            <div className="text-left">
+              <h3 className="text-xl font-semibold">Size:</h3>
             </div>
             <div className="mt-3 h-[120px]"></div>
           </div>
@@ -203,3 +211,47 @@ export default ReleaseDetails;
 // };
 
 // export default ReleaseDetails;
+// --------------------------------------------------------------------------------------
+// const ReleaseDetails = ({ isReleaseDetailsVisible, releaseData }) => {
+//   const [isOpen, setIsOpen] = React.useState(isReleaseDetailsVisible);
+
+//   React.useEffect(() => {
+//     setIsOpen(isReleaseDetailsVisible);
+//   }, [isReleaseDetailsVisible]);
+
+//   // React.useEffect(() => {
+//   //   setIsOpen(isReleaseDetailsVisible);
+//   //   return () => {
+//   //     // Cleanup any side effects here when modal is closed
+//   //   };
+//   // }, []);
+
+//   return (
+//     <Drawer open={isOpen} onOpenChange={setIsOpen}>
+// <DrawerContent>
+//   <div className="  mx-auto w-full ">
+//     <DrawerHeader>
+//       <DrawerTitle>Release Details: {releaseData.release}</DrawerTitle>
+
+//       <DrawerDescription>
+//         Version: {releaseData.version}
+//       </DrawerDescription>
+//     </DrawerHeader>
+//     <div className="p-4 pb-0">
+//       <div className="text-left">
+//         <h3 className="text-xl font-semibold">
+//           File Extension: {releaseData.fileExtension}
+//         </h3>
+//       </div>
+//       <div className="mt-3 h-[120px]"></div>
+//     </div>
+
+//     <DrawerFooter>
+//       <Button>Download</Button>
+//       <DrawerClose asChild>
+//         <Button variant="outline">Close</Button>
+//       </DrawerClose>
+//     </DrawerFooter>
+//   </div>
+// </DrawerContent>
+//     </Drawer>

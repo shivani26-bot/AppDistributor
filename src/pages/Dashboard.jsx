@@ -1,48 +1,120 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "@/components/Sidebar"; // Import Sidebar component
 import { Button } from "@/components/ui/button";
 import axios from "axios"; // Import axios
+import Cookies from "js-cookie"; // Import Cookies to manage cookies
 
 const Dashboard = () => {
+  const [userData, setUserData] = useState(null); // Assume this comes from some authentication logic
+  const [dataChange, setDataChange] = useState(false); // Placeholder for tracking data changes
   const [selectedOS, setSelectedOS] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [releaseType, setReleaseType] = useState("");
   const [appName, setAppName] = useState("");
   const [appIcon, setAppIcon] = useState(null); // In case you decide to upload icon later
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [apps, setApps] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [apps, setApps] = useState([]); // List of apps fetched from backend
+  const [searchTerm, setSearchTerm] = useState(""); // For filtering apps
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5; // Number of apps to display per page
+
+  // Toggle side sheet visibility
   const toggleSheet = () => setIsSheetOpen(!isSheetOpen);
 
-  // Define the handleIconChange function to update the appIcon state
-  const handleIconChange = (e) => {
-    const file = e.target.files[0]; // Get the selected file
-    setAppIcon(file); // Update the appIcon state with the selected file
+  // Store access token in a cookie when userData changes
+  useEffect(() => {
+    if (userData && userData.data) {
+      // Store the access token in a cookie
+      Cookies.set("accessToken", userData.data); // expires is set to 1 day
+    }
+  }, [userData, dataChange]);
+
+  // Fetch applications from backend
+  const fetchApplications = async () => {
+    const token = Cookies.get("accessToken"); // Retrieve the access token from the cookie
+    if (!token) {
+      console.log("Access token is missing!");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/app/getApplication", // Replace with your backend API URL
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Fetched apps:", response.data); // Log to check if data is coming correctly
+      setApps(Array.isArray(response.data.data) ? response.data.data : []);
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+      setApps([]); // In case of an error, ensure apps is set to an empty array
+    }
   };
 
+  // Fetch apps when the component mounts
+  useEffect(() => {
+    fetchApplications();
+  }, []); // Run once on component mount
+
+  // Filter apps based on search term (null/undefined safe)
+  const filteredApps = apps.filter((app) => {
+    return (
+      (app.appName &&
+        app.appName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (app.osType &&
+        app.osType.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (app.releaseType &&
+        app.releaseType.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (app.platformType &&
+        app.platformType.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  });
+
+  // Pagination logic
+  const indexOfLastApp = currentPage * rowsPerPage;
+  const indexOfFirstApp = indexOfLastApp - rowsPerPage;
+  const currentApps = filteredApps.slice(indexOfFirstApp, indexOfLastApp);
+
+  const totalPages = Math.ceil(filteredApps.length / rowsPerPage);
+
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Add a new app
   const handleAddNewApp = async (e) => {
     e.preventDefault();
 
-    // Prepare data as a JSON object instead of FormData
-    const appData = {
-      appName,
-      releaseType,
-      osType: selectedOS,
-      platformType: selectedPlatform,
-      // If you want to send the app icon URL or other image metadata, you can include it here
-      // For instance, if the icon URL is stored, you can pass that as well.
-      appIcon: appIcon ? appIcon.name : null, // Assuming you want to send the icon's file name or URL
-    };
-
     try {
+      // Prepare data as a JSON object instead of FormData
+      const appData = {
+        appName,
+        releaseType,
+        osType: selectedOS,
+        platformType: selectedPlatform,
+        appIcon: appIcon ? appIcon.name : null, // Send the icon's file name or URL
+      };
+
+      const token = Cookies.get("accessToken"); // Retrieve the access token from the cookie
+      console.log("token", token);
+
+      if (!token) {
+        console.log("Access token is missing!");
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:8000/api/app/registerApplication", // Replace with your backend API URL
         appData,
         {
           headers: {
             "Content-Type": "application/json", // Set content type for JSON
+            Authorization: `Bearer ${token}`, // Attach the token in the Authorization header
           },
         }
       );
@@ -50,16 +122,8 @@ const Dashboard = () => {
       // Handle successful response
       console.log("App added successfully:", response.data);
 
-      // After a successful response, add the new app to the state
-      setApps([
-        ...apps,
-        {
-          name: appName,
-          os: selectedOS,
-          releaseType,
-          platform: selectedPlatform,
-        },
-      ]);
+      // After a successful response, fetch the updated apps list
+      fetchApplications(); // Refresh apps list after adding a new app
 
       // Clear form fields
       setAppName("");
@@ -73,14 +137,6 @@ const Dashboard = () => {
       // Handle error (show error message to the user)
     }
   };
-
-  const filteredApps = apps.filter((app) => {
-    return (
-      app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.os.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.releaseType.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
 
   return (
     <div className="flex h-screen">
@@ -163,29 +219,65 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredApps.map((app, index) => (
-                <tr key={index} className="bg-white hover:bg-gray-50">
-                  <td className="px-4 py-2 border-b border-gray-300">
-                    <Link
-                      to={`/newrelease/${app.name}`}
-                      className="text-blue-500 hover:underline"
-                    >
-                      {app.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-300">
-                    {app.os}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-300">
-                    {app.releaseType}
-                  </td>
-                  <td className="px-4 py-2 border-b border-gray-300">
-                    {app.platform}
+              {currentApps.length > 0 ? (
+                currentApps.map((app, index) => (
+                  <tr key={index} className="bg-white hover:bg-gray-50">
+                    <td className="px-4 py-2 border-b border-gray-300">
+                      <Link
+                        to={`/releases/${app.appName}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        {app.appName}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 border-b border-gray-300">
+                      {app.osType}
+                    </td>
+                    <td className="px-4 py-2 border-b border-gray-300">
+                      {app.releaseType}
+                    </td>
+                    <td className="px-4 py-2 border-b border-gray-300">
+                      {app.platformType}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="px-4 py-2 border-b border-gray-300 text-center"
+                  >
+                    No apps available
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center p-4">
+          <Button
+            onClick={() =>
+              setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)
+            }
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            onClick={() =>
+              setCurrentPage(
+                currentPage < totalPages ? currentPage + 1 : totalPages
+              )
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
         </div>
 
         {/* Side Sheet */}
@@ -220,7 +312,7 @@ const Dashboard = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleIconChange} // Handle file change event here
+                  onChange={(e) => setAppIcon(e.target.files[0])}
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                 />
               </div>
@@ -247,71 +339,53 @@ const Dashboard = () => {
 
               {/* OS Radio Button */}
               <div className="mb-4">
-                <label className="block text-sm font-medium">Select OS</label>
-                <div className="flex gap-4 mt-1">
-                  <label className="flex items-center">
+                <label className="block text-sm font-medium">OS Type</label>
+                <div className="flex gap-4">
+                  <label>
                     <input
                       type="radio"
+                      name="osType"
                       value="ios"
                       checked={selectedOS === "ios"}
-                      onChange={() => setSelectedOS("ios")}
-                      className="mr-2"
+                      onChange={(e) => setSelectedOS(e.target.value)}
                     />
                     iOS
                   </label>
-                  <label className="flex items-center">
+                  <label>
                     <input
                       type="radio"
+                      name="osType"
                       value="android"
                       checked={selectedOS === "android"}
-                      onChange={() => setSelectedOS("android")}
-                      className="mr-2"
+                      onChange={(e) => setSelectedOS(e.target.value)}
                     />
                     Android
                   </label>
                 </div>
               </div>
 
-              {/* Platform Radio Button */}
+              {/* Platform */}
               <div className="mb-4">
                 <label className="block text-sm font-medium">
-                  Select Platform
+                  Platform Type
                 </label>
-                <div className="flex gap-4 mt-1">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="java"
-                      checked={selectedPlatform === "java"}
-                      onChange={() => setSelectedPlatform("java")}
-                      className="mr-2"
-                    />
-                    Java
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="kotlin"
-                      checked={selectedPlatform === "kotlin"}
-                      onChange={() => setSelectedPlatform("kotlin")}
-                      className="mr-2"
-                    />
-                    Kotlin
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="react-native"
-                      checked={selectedPlatform === "react-native"}
-                      onChange={() => setSelectedPlatform("react-native")}
-                      className="mr-2"
-                    />
-                    React Native
-                  </label>
-                </div>
+                <select
+                  value={selectedPlatform}
+                  onChange={(e) => setSelectedPlatform(e.target.value)}
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  required
+                >
+                  <option value="">Select Platform</option>
+                  <option value="java">Java</option>
+                  <option value="kotlin">Kotlin</option>
+                  <option value="react-native">React Native</option>
+                </select>
               </div>
 
-              <Button type="submit">Add new App</Button>
+              {/* Submit Button */}
+              <div className="mt-4 text-right">
+                <Button type="submit">Add App</Button>
+              </div>
             </form>
           </div>
         </div>
