@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import Sidebar from "@/components/Sidebar";
 
-import { columns } from "@/schemas/releaseColumns";
-import { ReleaseTable } from "@/components/ReleaseTable";
+// import { columns } from "dummy/releaseColumns";
+// import { ReleaseTable } from "dummy/ReleaseTable";
 import {
   Form,
   FormControl,
@@ -29,80 +29,82 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useDispatch, useSelector } from "react-redux";
-import { BarLoader } from "react-spinners";
+import { BarLoader, BeatLoader } from "react-spinners";
 
 import { ToastContainer, toast } from "react-toastify";
 import { postUploadBuildData } from "@/redux/feature/uploadBuildDataSlice";
 import { postReleaseData } from "@/redux/feature/releaseDataSlice";
-function getData() {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "a1b2c3d4",
-      release: "1.0.0",
-      version: "1.0.0",
-      fileExtension: ".zip",
-    },
-    {
-      id: "e5f6g7h8",
-      release: "1.1.0",
-      version: "1.1.0",
-      fileExtension: ".tar.gz",
-    },
-    {
-      id: "i9j0k1l2",
-      release: "2.0.0",
-      version: "2.0.0",
-      fileExtension: ".exe",
-    },
-    {
-      id: "m3n4o5p6",
-      release: "2.1.0",
-      version: "2.1.0",
-      fileExtension: ".dmg",
-    },
-    {
-      id: "q7r8s9t0",
-      release: "3.0.0",
-      version: "3.0.0",
-      fileExtension: ".apk",
-    },
-    {
-      id: "u1v2w3x4",
-      release: "3.1.0",
-      version: "3.1.0",
-      fileExtension: ".iso",
-    },
-    {
-      id: "y5z6a7b8",
-      release: "4.0.0",
-      version: "4.0.0",
-      fileExtension: ".bin",
-    },
-    {
-      id: "c9d0e1f2",
-      release: "4.1.0",
-      version: "4.1.0",
-      fileExtension: ".pkg",
-    },
-    {
-      id: "g3h4i5j6",
-      release: "5.0.0",
-      version: "5.0.0",
-      fileExtension: ".deb",
-    },
-    {
-      id: "k7l8m9n0",
-      release: "5.1.0",
-      version: "5.1.0",
-      fileExtension: ".rpm",
-    },
-  ];
-  // ...
-}
+import ReleaseTable from "@/components/ReleaseTable";
+// function getData() {
+//   // Fetch data from your API here.
+//   return [
+//     {
+//       id: "a1b2c3d4",
+//       release: "1.0.0",
+//       version: "1.0.0",
+//       fileExtension: ".zip",
+//     },
+//     {
+//       id: "e5f6g7h8",
+//       release: "1.1.0",
+//       version: "1.1.0",
+//       fileExtension: ".tar.gz",
+//     },
+//     {
+//       id: "i9j0k1l2",
+//       release: "2.0.0",
+//       version: "2.0.0",
+//       fileExtension: ".exe",
+//     },
+//     {
+//       id: "m3n4o5p6",
+//       release: "2.1.0",
+//       version: "2.1.0",
+//       fileExtension: ".dmg",
+//     },
+//     {
+//       id: "q7r8s9t0",
+//       release: "3.0.0",
+//       version: "3.0.0",
+//       fileExtension: ".apk",
+//     },
+//     {
+//       id: "u1v2w3x4",
+//       release: "3.1.0",
+//       version: "3.1.0",
+//       fileExtension: ".iso",
+//     },
+//     {
+//       id: "y5z6a7b8",
+//       release: "4.0.0",
+//       version: "4.0.0",
+//       fileExtension: ".bin",
+//     },
+//     {
+//       id: "c9d0e1f2",
+//       release: "4.1.0",
+//       version: "4.1.0",
+//       fileExtension: ".pkg",
+//     },
+//     {
+//       id: "g3h4i5j6",
+//       release: "5.0.0",
+//       version: "5.0.0",
+//       fileExtension: ".deb",
+//     },
+//     {
+//       id: "k7l8m9n0",
+//       release: "5.1.0",
+//       version: "5.1.0",
+//       fileExtension: ".rpm",
+//     },
+//   ];
+//   // ...
+// }
 
 const Releases = () => {
   const [isUploading, setIsUploading] = useState(false);
+
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState("");
   const [error, setError] = useState("");
@@ -244,7 +246,7 @@ const Releases = () => {
           }
         });
       } else {
-        // setFileName("");
+        setFileName("");
         setError(
           `.${fileExtension.toLowerCase()} is not supported for this OS`
         );
@@ -310,15 +312,18 @@ const Releases = () => {
                         color="#36d7b7"
                       />
                     )}
-                    <input
-                      name="file"
-                      ref={fileInputRef}
-                      id="file-upload"
-                      type="file"
-                      className="hidden"
-                      required
-                      onChange={fileUpload}
-                    />
+
+                    {!isUploading && (
+                      <input
+                        name="file"
+                        ref={fileInputRef}
+                        id="file-upload"
+                        type="file"
+                        className="hidden"
+                        required
+                        onChange={fileUpload}
+                      />
+                    )}
 
                     <div className="text-xl    text-left">
                       {fileName ? (
@@ -394,6 +399,7 @@ const Releases = () => {
                     </div>
                     <SheetFooter>
                       {/* <SheetClose asChild> */}
+                      {/* <BeatLoader /> */}
                       <Button type="submit" className="w-full">
                         Upload
                       </Button>
@@ -430,17 +436,26 @@ const Releases = () => {
             </Sheet>
           </div>
 
-          <div className="flex flex-col justify-center items-center h-screen py-16">
+          {/* <div className="flex flex-col justify-center items-center h-screen py-16">
             <img className="w-60 h-50 " src="/empty-box.png" />
             <p className="text-2xl font-bold leading-8">
               You have no releases yet
             </p>
             <p>Start distributing your app among your teams and testers.</p>
-          </div>
-
-          {/* <div className="container mx-auto py-10">
-            <ReleaseTable columns={columns} data={data} />
           </div> */}
+          {/* <div className="bg-gray-100 p-6 rounded-lg shadow-lg"> */}
+
+          <div className="container mx-auto   rounded-lg shadow-lg">
+            <div className="flex justify-center items-center p-4">
+              <p className=" font-bold text-center text-xl mr-2">
+                Release History
+              </p>
+
+              <img className="w-6 h-6" src="/public/history (1).png" />
+            </div>
+            <ReleaseTable />
+          </div>
+          {/* </div> */}
         </div>
       </div>
     </>

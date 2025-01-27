@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Minus, Plus } from "lucide-react";
 
@@ -13,88 +15,58 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
-const data = [
-  {
-    goal: 400,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 278,
-  },
-  {
-    goal: 189,
-  },
-  {
-    goal: 239,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 278,
-  },
-  {
-    goal: 189,
-  },
-  {
-    goal: 349,
-  },
-];
-
-const ReleaseDetails = ({ isReleaseDetailsVisible, releaseData }) => {
-  const [goal, setGoal] = React.useState(350);
-  const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    setOpen(isReleaseDetailsVisible); // Set the drawer open state based on the prop
-  }, [isReleaseDetailsVisible]);
+const ReleaseDetails = ({ onClose }) => {
+  // const ReleaseDetails = () => {
   return (
-    // <Drawer>
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={true}>
+      {/* <Drawer> */}
       {/* <DrawerTrigger asChild>
         <Button variant="outline">Open Drawer</Button>
       </DrawerTrigger> */}
       <DrawerContent>
         <div className="  mx-auto w-full ">
           <DrawerHeader>
-            <DrawerTitle>Release Details: {releaseData.release}</DrawerTitle>
-
-            <DrawerDescription>
-              Version: {releaseData.version}
-            </DrawerDescription>
+            <DrawerTitle className="text-2xl">Release Id</DrawerTitle>
+            {/* <DrawerDescription>Set your daily activity goal.</DrawerDescription> */}
           </DrawerHeader>
           <div className="p-4 pb-0">
-            <div className="text-left">
-              <h3 className="text-xl font-semibold">
-                File Extension: {releaseData.fileExtension}
-              </h3>
+            <div className="flex items-center justify-center space-x-2">
+              <div className="flex-1 text-center">
+                <img className="w-32 h-32" src="/public/release.png" />
+              </div>
             </div>
-            <div className="text-left">
-              <h3 className="text-xl font-semibold">Size:</h3>
+            <div className="mt-3 h-[120px]">
+              {" "}
+              <div className="flex justify-between items-center p-2 mr-8 ml-8 mb-2 ">
+                <p>Version: 1.0.0 </p>
+                <p> Release Notes: This is first Release</p>
+              </div>
+              <div className="flex justify-between items-center p-2 mr-8 ml-8">
+                <p>Size: 1.2MB</p>
+                <p>FileExtension: .apk</p>
+              </div>
+            </div>
+          </div>
+          {/* <div className="p-4 pb-0">
+            <div className="flex items-center justify-center space-x-2">
+              <div className="flex-1 text-center"></div>
             </div>
             <div className="mt-3 h-[120px]"></div>
-          </div>
-
+          </div> */}
           <DrawerFooter>
-            <Button>Download</Button>
-            <DrawerClose asChild>
-              <Button variant="outline">Close</Button>
-            </DrawerClose>
+            <Button onClick={onClose}>Close</Button>
+            {/* <DrawerClose asChild>
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </DrawerClose> */}
           </DrawerFooter>
+          {/* <DrawerFooter>
+            <Button>Close</Button>
+            <DrawerClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter> */}
         </div>
       </DrawerContent>
     </Drawer>

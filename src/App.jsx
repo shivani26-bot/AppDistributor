@@ -38,7 +38,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/releases/:appName",
-        element: <Releases />,
+        element: (
+          <RequireAuth>
+            <Releases />
+          </RequireAuth>
+        ),
       },
     ],
   },

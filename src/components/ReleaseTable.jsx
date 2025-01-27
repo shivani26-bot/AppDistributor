@@ -1,10 +1,4 @@
 import {
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
   Table,
   TableBody,
   TableCell,
@@ -14,132 +8,202 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-// DataTable component in JavaScript
-export function ReleaseTable({ columns, data }) {
-  const pageSize = 5; // Set a fixed page size of 5
-  const [pageIndex, setPageIndex] = useState(0);
+import ReleaseDetails from "./ReleaseDetails";
+import DeleteModal from "./DeleteModal";
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      pagination: {
-        pageSize, // Number of rows per page
-        pageIndex, // Set the pageIndex from the state
-      },
-    },
-    onPaginationChange: (updater) => {
-      // Update pagination state manually
-      setPageIndex((prevPageIndex) => {
-        const newState = updater({ pageIndex: prevPageIndex, pageSize });
-        return newState.pageIndex;
-      });
-    },
-  });
+const releases = [
+  {
+    id: 1,
+    releaseId: "R001",
+    version: "1.0.0",
+    fileExtension: ".apk",
+  },
+  {
+    id: 2,
+    releaseId: "R002",
+    version: "1.0.1",
+    fileExtension: ".apk",
+  },
+  {
+    id: 3,
+    releaseId: "R003",
+    version: "1.1.0",
+    fileExtension: ".aab",
+  },
+  {
+    id: 4,
+    releaseId: "R004",
+    version: "1.1.1",
+    fileExtension: ".aab",
+  },
+  {
+    id: 5,
+    releaseId: "R005",
+    version: "1.2.0",
+    fileExtension: ".apk",
+  },
+  {
+    id: 6,
+    releaseId: "R006",
+    version: "2.0.0",
+    fileExtension: ".dmg",
+  },
+  {
+    id: 7,
+    releaseId: "R007",
+    version: "2.0.1",
+    fileExtension: ".dmg",
+  },
+  {
+    id: 8,
+    releaseId: "R008",
+    version: "2.1.0",
+    fileExtension: ".apk",
+  },
+  {
+    id: 9,
+    releaseId: "R009",
+    version: "3.0.0",
+    fileExtension: ".aab",
+  },
+  {
+    id: 10,
+    releaseId: "R010",
+    version: "3.0.1",
+    fileExtension: ".aab",
+  },
+];
+
+const ReleaseTable = () => {
+  const pageSize = 5; // Set a fixed page size of 5
+  const [pageIndex, setPageIndex] = useState(0); // Track current page index
+  const [showDetails, setShowDetails] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const startIndex = pageIndex * pageSize;
+  const currentReleases = releases.slice(startIndex, startIndex + pageSize);
 
   const handleNextPage = () => {
-    if (table.getCanNextPage()) {
-      setPageIndex((prev) => prev + 1); // Move to the next page by incrementing the pageIndex
+    if (startIndex + pageSize < releases.length) {
+      setPageIndex((prev) => prev + 1);
     }
   };
 
-  // Handle "Previous" button click
   const handlePreviousPage = () => {
-    if (table.getCanPreviousPage()) {
-      setPageIndex((prev) => prev - 1); // Move to the previous page by decrementing the pageIndex
+    if (pageIndex > 0) {
+      setPageIndex((prev) => prev - 1);
     }
+  };
+  const handleViewDetails = () => {
+    setShowDetails(true); // Show the component
+  };
+  const handleCloseDrawer = () => {
+    setShowDetails(false); // Close the drawer
+  };
+  const handleDelete = () => {
+    setShowDeleteModal(true); // Show the delete modal
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false); // Close the delete modal
   };
 
   return (
-    <div>
-      <div className="rounded-md border">
-        {/* <Table> component serves as the container for the entire table structure. Inside it, there are two main parts: the header (<TableHeader>) and the body (<TableBody>).  */}
-        <Table>
-          <TableHeader>
-            {/* <TableHeader> part is responsible for displaying the header rows of the table */}
-            {/* table.getHeaderGroups(): This method returns an array of header
-            groups. In React Table, you may have multiple groups of headers, for
-            example, if you are grouping columns. headerGroup.headers: Each
-            group of headers contains multiple header cells. */}
-            {/* flexRender: This function is used to render the actual content of each header. It takes the header.column.columnDef.header (i.e., the content or label of the header) and the context (header.getContext()), which provides additional information, like whether the column is sortable, etc. */}
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {/* The body of the table is responsible for rendering the rows of data. This is where you map through the data that is passed to the table and display each row as a set of cells. */}
-            {/* table.getRowModel().rows: This provides the rows of data to be displayed in the table. getRowModel() is a method from the React Table library that returns the row model, including the rows of data.
-Conditionally Render Rows:
-If there are rows to display (table.getRowModel().rows?.length), the code maps over each row and renders it as a <TableRow>. */}
-            {/* If there are no rows (else case), it displays a single row with a message "No results." */}
-            {/* (<TableCell>), which are created by mapping over row.getVisibleCells():
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Release ↓</TableHead>
+            <TableHead>Version</TableHead>
+            <TableHead>File Extension</TableHead>
+            {/* <TableHead className="text-right">Amount</TableHead> */}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {currentReleases.map((release) => (
+            <TableRow key={release.id}>
+              <TableCell className="font-medium">{release.releaseId}</TableCell>
+              <TableCell>{release.version}</TableCell>
+              <TableCell>{release.fileExtension}</TableCell>
+              <div className="flex justify-center items-center mt-2">
+                <button
+                  className="w-8 h-8 mr-2  cursor-pointer bg-transparent border-none"
+                  title="Download"
+                >
+                  <img
+                    className="w-full h-full"
+                    src="/public/download.png"
+                    alt="Download"
+                  />
+                </button>
+                <button
+                  className="w-8 h-8 mr-2  cursor-pointer bg-transparent border-none"
+                  title="Delete"
+                >
+                  <img
+                    className="w-full h-full"
+                    src="/public/trash.png"
+                    alt="Delete"
+                    onClick={handleDelete}
+                  />
+                </button>
+                <button
+                  className="w-8 h-8 mr-2 cursor-pointer bg-transparent border-none"
+                  title="View Details"
+                  onClick={handleViewDetails}
+                >
+                  <img
+                    className="w-full h-full"
+                    src="/public/search.png"
+                    alt="View Details"
+                  />
+                </button>
+                {showDetails && <ReleaseDetails onClose={handleCloseDrawer} />}
+                {showDeleteModal && <DeleteModal onClose={closeDeleteModal} />}
+              </div>
 
-row.getVisibleCells(): This method returns the visible cells for the row. Not all cells may be visible depending on things like column visibility, pagination, etc.
-flexRender(cell.column.columnDef.cell, cell.getContext()): This is used to render the content of each cell. It takes the actual content (cell.column.columnDef.cell) and the context of the cell (cell.getContext()), which provides things like additional formatting, or how to render the data in the cell. */}
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+              {/* <TableCell className="text-right">
+                {release.totalAmount}
+              </TableCell> */}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {/* <ReleaseDetails /> */}
+      <div className="flex items-center justify-end space-x-2 py-4 mr-4">
         <Button
           variant="outline"
           size="sm"
-          //   onClick={() => table.previousPage()}
           onClick={handlePreviousPage}
-          disabled={!table.getCanPreviousPage()} //Disable if on the first page
+          disabled={pageIndex === 0} // Disable if on the first page
         >
           Previous
         </Button>
         <Button
           variant="outline"
           size="sm"
-          //   onClick={() => table.nextPage()}
           onClick={handleNextPage}
-          disabled={!table.getCanNextPage()} // Disable if on the last page
+          disabled={startIndex + pageSize >= releases.length} // Disable if on the last page
         >
           Next
         </Button>
       </div>
-    </div>
+
+      {/* Optional: Display current page information */}
+      <div className="flex justify-center py-2">
+        <span>
+          Page {pageIndex + 1} of {Math.ceil(releases.length / pageSize)}
+        </span>
+      </div>
+    </>
   );
+};
+
+export default ReleaseTable;
+{
+  /* <TableFooter>
+        <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell className="text-right">$2,500.00</TableCell>
+        </TableRow>
+      </TableFooter> */
 }
