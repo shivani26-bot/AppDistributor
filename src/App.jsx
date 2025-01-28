@@ -37,7 +37,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/releases/:appName",
+        path: "/releases/:appName/:appId",
         element: (
           <RequireAuth>
             <Releases />

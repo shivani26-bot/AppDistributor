@@ -11,74 +11,77 @@ import { useState } from "react";
 import ReleaseDetails from "./ReleaseDetails";
 import DeleteModal from "./DeleteModal";
 
-const releases = [
-  {
-    id: 1,
-    releaseId: "R001",
-    version: "1.0.0",
-    fileExtension: ".apk",
-  },
-  {
-    id: 2,
-    releaseId: "R002",
-    version: "1.0.1",
-    fileExtension: ".apk",
-  },
-  {
-    id: 3,
-    releaseId: "R003",
-    version: "1.1.0",
-    fileExtension: ".aab",
-  },
-  {
-    id: 4,
-    releaseId: "R004",
-    version: "1.1.1",
-    fileExtension: ".aab",
-  },
-  {
-    id: 5,
-    releaseId: "R005",
-    version: "1.2.0",
-    fileExtension: ".apk",
-  },
-  {
-    id: 6,
-    releaseId: "R006",
-    version: "2.0.0",
-    fileExtension: ".dmg",
-  },
-  {
-    id: 7,
-    releaseId: "R007",
-    version: "2.0.1",
-    fileExtension: ".dmg",
-  },
-  {
-    id: 8,
-    releaseId: "R008",
-    version: "2.1.0",
-    fileExtension: ".apk",
-  },
-  {
-    id: 9,
-    releaseId: "R009",
-    version: "3.0.0",
-    fileExtension: ".aab",
-  },
-  {
-    id: 10,
-    releaseId: "R010",
-    version: "3.0.1",
-    fileExtension: ".aab",
-  },
-];
+// const releases = [
+//   {
+//     id: 1,
+//     releaseId: "R001",
+//     version: "1.0.0",
+//     fileExtension: ".apk",
+//   },
+//   {
+//     id: 2,
+//     releaseId: "R002",
+//     version: "1.0.1",
+//     fileExtension: ".apk",
+//   },
+//   {
+//     id: 3,
+//     releaseId: "R003",
+//     version: "1.1.0",
+//     fileExtension: ".aab",
+//   },
+//   {
+//     id: 4,
+//     releaseId: "R004",
+//     version: "1.1.1",
+//     fileExtension: ".aab",
+//   },
+//   {
+//     id: 5,
+//     releaseId: "R005",
+//     version: "1.2.0",
+//     fileExtension: ".apk",
+//   },
+//   {
+//     id: 6,
+//     releaseId: "R006",
+//     version: "2.0.0",
+//     fileExtension: ".dmg",
+//   },
+//   {
+//     id: 7,
+//     releaseId: "R007",
+//     version: "2.0.1",
+//     fileExtension: ".dmg",
+//   },
+//   {
+//     id: 8,
+//     releaseId: "R008",
+//     version: "2.1.0",
+//     fileExtension: ".apk",
+//   },
+//   {
+//     id: 9,
+//     releaseId: "R009",
+//     version: "3.0.0",
+//     fileExtension: ".aab",
+//   },
+//   {
+//     id: 10,
+//     releaseId: "R010",
+//     version: "3.0.1",
+//     fileExtension: ".aab",
+//   },
+// ];
 
-const ReleaseTable = () => {
-  const pageSize = 5; // Set a fixed page size of 5
+const ReleaseTable = ({ releases, appId }) => {
+  console.log("releases", releases);
+
+  const pageSize = 4; // Set a fixed page size of 5
   const [pageIndex, setPageIndex] = useState(0); // Track current page index
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedRelease, setSelectedRelease] = useState(null);
   const startIndex = pageIndex * pageSize;
   const currentReleases = releases.slice(startIndex, startIndex + pageSize);
 
@@ -93,18 +96,30 @@ const ReleaseTable = () => {
       setPageIndex((prev) => prev - 1);
     }
   };
-  const handleViewDetails = () => {
-    setShowDetails(true); // Show the component
-  };
-  const handleCloseDrawer = () => {
-    setShowDetails(false); // Close the drawer
-  };
+  // const handleViewDetails = () => {
+  //   setShowDetails(true); // Show the component
+  // };
+  // const handleCloseDrawer = () => {
+  //   setShowDetails(false); // Close the drawer
+  // };
   const handleDelete = () => {
     setShowDeleteModal(true); // Show the delete modal
   };
 
   const closeDeleteModal = () => {
     setShowDeleteModal(false); // Close the delete modal
+  };
+
+  const handleRowClick = (release) => {
+    setSelectedRelease(release);
+    console.log("current row release data:", release);
+  };
+
+  const handleDownload = (url) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = url.split("/").pop();
+    link.click();
   };
 
   return (
@@ -114,16 +129,21 @@ const ReleaseTable = () => {
           <TableRow>
             <TableHead className="w-[100px]">Release ↓</TableHead>
             <TableHead>Version</TableHead>
-            <TableHead>File Extension</TableHead>
+            {/* <TableHead>File Extension</TableHead> */}
             {/* <TableHead className="text-right">Amount</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentReleases.map((release) => (
-            <TableRow key={release.id}>
-              <TableCell className="font-medium">{release.releaseId}</TableCell>
+            <TableRow key={release._id} onClick={() => handleRowClick(release)}>
+              <TableCell className="font-medium">
+                <div className="flex items-center">
+                  <img className="w-8 h-8 mr-2" src="/public/release.png" />{" "}
+                  {release.buildNumber}
+                </div>
+              </TableCell>
               <TableCell>{release.version}</TableCell>
-              <TableCell>{release.fileExtension}</TableCell>
+              {/* <TableCell>{release.fileExtension}</TableCell> */}
               <div className="flex justify-center items-center mt-2">
                 <button
                   className="w-8 h-8 mr-2  cursor-pointer bg-transparent border-none"
@@ -133,6 +153,7 @@ const ReleaseTable = () => {
                     className="w-full h-full"
                     src="/public/download.png"
                     alt="Download"
+                    onClick={() => handleDownload(release.build)}
                   />
                 </button>
                 <button
@@ -146,7 +167,7 @@ const ReleaseTable = () => {
                     onClick={handleDelete}
                   />
                 </button>
-                <button
+                {/* <button
                   className="w-8 h-8 mr-2 cursor-pointer bg-transparent border-none"
                   title="View Details"
                   onClick={handleViewDetails}
@@ -156,9 +177,16 @@ const ReleaseTable = () => {
                     src="/public/search.png"
                     alt="View Details"
                   />
-                </button>
-                {showDetails && <ReleaseDetails onClose={handleCloseDrawer} />}
-                {showDeleteModal && <DeleteModal onClose={closeDeleteModal} />}
+                </button> */}
+                {/* {showDetails && <ReleaseDetails onClose={handleCloseDrawer} />} */}
+
+                {showDeleteModal && (
+                  <DeleteModal
+                    onClose={closeDeleteModal}
+                    releaseId={release._id}
+                    appId={appId}
+                  />
+                )}
               </div>
 
               {/* <TableCell className="text-right">

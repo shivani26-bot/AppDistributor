@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,9 +32,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { BarLoader, BeatLoader } from "react-spinners";
 
 import { ToastContainer, toast } from "react-toastify";
-import { postUploadBuildData } from "@/redux/feature/uploadBuildDataSlice";
+import {
+  clearBuildUrlData,
+  postUploadBuildData,
+} from "@/redux/feature/uploadBuildDataSlice";
 import { postReleaseData } from "@/redux/feature/releaseDataSlice";
 import ReleaseTable from "@/components/ReleaseTable";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchReleaseData } from "@/redux/feature/getReleaseDataSlice";
+import Cookies from "js-cookie";
 // function getData() {
 //   // Fetch data from your API here.
 //   return [
@@ -104,12 +110,19 @@ import ReleaseTable from "@/components/ReleaseTable";
 
 const Releases = () => {
   const [isUploading, setIsUploading] = useState(false);
-
+  const { appName, appId } = useParams();
+  const navigate = useNavigate();
+  console.log(appName, appId);
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const accessToken = Cookies.get("accessToken");
 
+  const items = useSelector((state) => state.getReleaseData.items);
+  console.log("item", items);
+  // const success = useSelector((state) => state.getReleaseData.data?.success);
+  // console.log("data", success);
   const notifySuccess = () => {
     toast.success("Build Uploaded successfully"),
       {
@@ -182,33 +195,49 @@ const Releases = () => {
     defaultValues: {
       // file: "",
       version: "",
-      releaseNotes: "",
+      releaseNote: "",
     },
   });
 
+  useEffect(() => {
+    if (accessToken) {
+      dispatch(fetchReleaseData({ accessToken, appId }));
+    }
+  }, [dispatch, accessToken, appId]);
+
+  const triggerFetchData = () => {
+    if (accessToken) {
+      dispatch(fetchReleaseData({ accessToken, appId }));
+    }
+  };
   const onSubmit = (formData) => {
     setFileName("");
     setError("");
     fileInputRef.current.value = "";
-    console.log(formData);
-    const { version, releaseNotes } = formData;
-    console.log(buildUrlData, version, releaseNotes);
+    console.log("fd", formData);
+    const { version, releaseNote } = formData;
+    console.log("bdvrn", buildUrlData, version, releaseNote);
     // notifyReleaseSuccess();
     console.log("url2", buildUrlData?.data || "No data available");
     if (buildUrlData && buildUrlData?.data) {
       console.log("url3", buildUrlData?.data || "No data available");
       // notifyReleaseSuccess();
+
       dispatch(
-        postReleaseData({ build: buildUrlData.data, version, releaseNotes })
+        postReleaseData({
+          build: buildUrlData.data,
+          version,
+          releaseNote,
+          appId,
+        })
       ).then((response) => {
         {
           if (!response.payload.success) {
             notifyReleaseFailure(response.payload.message);
           } else {
             notifyReleaseSuccess();
-            setTimeout(() => {
-              navigate("/releases");
-            }, 3000);
+            triggerFetchData();
+            dispatch(clearBuildUrlData());
           }
         }
       });
@@ -373,7 +402,7 @@ const Releases = () => {
                     <div className="mt-4 mb-4">
                       <FormField
                         control={form.control}
-                        name="releaseNotes"
+                        name="releaseNote"
                         className="mt-4"
                         render={({ field }) => (
                           <FormItem>
@@ -397,14 +426,14 @@ const Releases = () => {
                         )}
                       />
                     </div>
-                    <SheetFooter>
-                      {/* <SheetClose asChild> */}
-                      {/* <BeatLoader /> */}
-                      <Button type="submit" className="w-full">
-                        Upload
-                      </Button>
-                      {/* </SheetClose> */}
-                    </SheetFooter>
+                    {/* <SheetFooter> */}
+                    {/* <SheetClose asChild> */}
+                    {/* <BeatLoader /> */}
+                    <Button type="submit" className="w-full">
+                      Upload
+                    </Button>
+                    {/* </SheetClose> */}
+                    {/* </SheetFooter> */}
 
                     {/* <Button type="submit" className="w-full">
                       Upload
@@ -436,25 +465,28 @@ const Releases = () => {
             </Sheet>
           </div>
 
-          {/* <div className="flex flex-col justify-center items-center h-screen py-16">
-            <img className="w-60 h-50 " src="/empty-box.png" />
-            <p className="text-2xl font-bold leading-8">
-              You have no releases yet
-            </p>
-            <p>Start distributing your app among your teams and testers.</p>
-          </div> */}
           {/* <div className="bg-gray-100 p-6 rounded-lg shadow-lg"> */}
+          {items.length > 0 ? (
+            <div className="container mx-auto   rounded-lg shadow-lg">
+              <div className="flex justify-center items-center p-4">
+                <p className=" font-bold text-center text-xl mr-2">
+                  Release History
+                </p>
 
-          <div className="container mx-auto   rounded-lg shadow-lg">
-            <div className="flex justify-center items-center p-4">
-              <p className=" font-bold text-center text-xl mr-2">
-                Release History
-              </p>
-
-              <img className="w-6 h-6" src="/public/history (1).png" />
+                <img className="w-6 h-6" src="/public/history (1).png" />
+              </div>
+              <ReleaseTable releases={items} appId={appId} />
             </div>
-            <ReleaseTable />
-          </div>
+          ) : (
+            <div className="flex flex-col justify-center items-center h-screen py-16">
+              <img className="w-60 h-50 " src="/empty-box.png" />
+              <p className="text-2xl font-bold leading-8">
+                You have no releases yet
+              </p>
+              <p>Start distributing your app among your teams and testers.</p>
+            </div>
+          )}
+
           {/* </div> */}
         </div>
       </div>

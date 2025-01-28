@@ -1,35 +1,34 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
-export const postReleaseData = createAsyncThunk(
-  "postReleaseData",
-  async (releaseData) => {
+export const deleteRelease = createAsyncThunk(
+  "deleteReleaseData",
+  async ({ accessToken, releaseId }) => {
+    console.log(accessToken);
+    console.log("rid3", releaseId);
     try {
-      console.log("releaseData", releaseData);
-      const { build, version, releaseNote, appId } = releaseData;
-      console.log("appId", appId);
-      const accessToken = Cookies.get("accessToken");
+      //   console.log("releaseData", releaseData);
 
-      console.log("at", accessToken);
-      if (!accessToken) {
-        console.error("No JWT token found.User is not authenticated");
-        throw new Error("No token found");
-      }
+      //   console.log("appId", appId);
+      //   const accessToken = Cookies.get("accessToken");
+
+      //   console.log("at", accessToken);
+      //   if (!accessToken) {
+      //     console.error("No JWT token found.User is not authenticated");
+      //     throw new Error("No token found");
+      //   }
 
       const response = await fetch(
-        `http://localhost:8000/api/release/registerRelease/${appId}`,
+        `http://localhost:8000/api/release/deleteRelease`,
         {
-          method: "POST",
+          method: "DELETE",
           headers: {
             "Content-type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
           credentials: "include",
           body: JSON.stringify({
-            build,
-            version,
-            releaseNote,
-            applicationId: appId,
+            _id: releaseId,
           }),
         }
       );
@@ -43,29 +42,30 @@ export const postReleaseData = createAsyncThunk(
   }
 );
 
-const releaseDataSlice = createSlice({
-  name: "releaseData",
+const deleteReleaseDataSlice = createSlice({
+  name: "deleteReleaseData",
   initialState: {
     isLoading: false,
-    buildData: null,
+    data: null,
+
     isError: false,
   },
 
   extraReducers: (builder) => {
-    builder.addCase(postReleaseData.pending, (state) => {
+    builder.addCase(deleteRelease.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(postReleaseData.fulfilled, (state, action) => {
+    builder.addCase(deleteRelease.fulfilled, (state, action) => {
       console.log("action", action); //{type: 'postLoginData/fulfilled', payload: {…}, meta: {…}}
       state.isLoading = false;
-      state.buildData = action.payload;
+      state.data = action.payload;
       state.isError = false;
       console.log("action", action); //{type: 'postLoginData/fulfilled', payload: {…}, meta: {…}}
     });
-    builder.addCase(postReleaseData.rejected, (state) => {
+    builder.addCase(deleteRelease.rejected, (state) => {
       state.isError = true;
     });
   },
 });
 
-export default releaseDataSlice.reducer;
+export default deleteReleaseDataSlice.reducer;

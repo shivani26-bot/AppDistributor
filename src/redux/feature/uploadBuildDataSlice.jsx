@@ -47,6 +47,11 @@ const uploadBuildDataSlice = createSlice({
     buildUrlData: "",
     isError: false,
   },
+  reducers: {
+    clearBuildUrlData: (state) => {
+      state.buildUrlData = "";
+    },
+  },
 
   extraReducers: (builder) => {
     builder.addCase(postUploadBuildData.pending, (state) => {
@@ -64,5 +69,5 @@ const uploadBuildDataSlice = createSlice({
     });
   },
 });
-
+export const { clearBuildUrlData } = uploadBuildDataSlice.actions;
 export default uploadBuildDataSlice.reducer;

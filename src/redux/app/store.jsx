@@ -6,6 +6,8 @@ import authLogoutSlice from "../feature/authLogoutSlice";
 
 import uploadBuildDataSlice from "../feature/uploadBuildDataSlice";
 import releaseDataSlice from "../feature/releaseDataSlice";
+import getReleaseDataSlice from "../feature/getReleaseDataSlice";
+import deleteReleaseDataSlice from "../feature/deleteReleaseDataSlice";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -15,6 +17,8 @@ export const reduxStore = configureStore({
     authLogout: authLogoutSlice,
     uploadBuildData: uploadBuildDataSlice,
     releaseData: releaseDataSlice,
+    getReleaseData: getReleaseDataSlice,
+    deleteReleaseData: deleteReleaseDataSlice,
   },
 });
 
