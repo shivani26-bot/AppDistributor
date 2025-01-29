@@ -15,9 +15,9 @@ const LandingPage = () => {
   const navigate = useNavigate();
   return (
     <>
-      <div className="bg-[url('/landingpage.png')] bg-cover bg-center h-screen ">
-        <div className="py-4 flex justify-between items-center px-4">
-          <div>
+      <div className="bg-[url('/appdistributor.jpg')] bg-cover bg-center h-screen ">
+        <div className="py-4 flex justify-end items-center px-4">
+          {/* <div>
             <div className="flex  items-center mb-2">
               <img className="w-10 mr-2" src="/microsoft.png" alt="Microsoft" />
               <p className="mr-2  text-white text-3xl ">Microsoft</p>
@@ -26,7 +26,7 @@ const LandingPage = () => {
               Visual Studio{" "}
               <span className="text-3xl font-bold"> App Center</span>
             </p>
-          </div>
+          </div> */}
           <Button
             onClick={() => navigate("/authSignup")}
             className="text-white text-lg px-4 py-2 rounded bg-blue-500 hover:bg-blue-600"
@@ -36,7 +36,9 @@ const LandingPage = () => {
         </div>
       </div>
       <div className="mx-10 my-5 bg-gray-100 p-6 rounded-lg shadow-lg">
-        <p className="text-3xl text-center mb-8">App center is Awesome for:</p>
+        <p className="text-3xl text-center mb-8">
+          App Distributor is Awesome for:
+        </p>
         <div className="flex justify-between items-center my-4">
           <div className="flex flex-col items-center">
             <img className="w-16 h-16 object-contain" src="/logo-android.svg" />

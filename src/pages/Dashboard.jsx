@@ -20,6 +20,8 @@ const Dashboard = () => {
   const [deleteSuccess, setDeleteSuccess] = useState("");
   const [toastMessage, setToastMessage] = useState(""); // State for toast message
   const [toastVisible, setToastVisible] = useState(false); // State to control visibility of the toast
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [appToDelete, setAppToDelete] = useState(null); // App to delete
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +85,7 @@ const Dashboard = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Delete an app
-  const handleDeleteApp = async (appId) => {
+  const handleDeleteApp = async () => {
     const token = Cookies.get("accessToken");
     if (!token) {
       console.log("Access token is missing!");
@@ -98,7 +100,7 @@ const Dashboard = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // Authorization header
           },
-          data: { _id: appId }, // Send appId as a JSON object
+          data: { _id: appToDelete._id }, // Send appId as a JSON object
         }
       );
       console.log("App deleted successfully:", response.data);
@@ -107,6 +109,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error deleting app:", error);
       showToast("Error deleting app"); // Show error message
+    } finally {
+      setIsModalOpen(false); // Close the modal after action
     }
   };
 
@@ -172,6 +176,16 @@ const Dashboard = () => {
     }, 5000);
   };
 
+  const openDeleteModal = (app) => {
+    setAppToDelete(app);
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false); // Close the modal
+    setAppToDelete(null); // Clear selected app
+  };
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -199,37 +213,6 @@ const Dashboard = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <select
-              value={selectedOS}
-              onChange={(e) => setSelectedOS(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white w-full sm:max-w-xs"
-            >
-              <option value="">Select OS</option>
-              <option value="ios">iOS</option>
-              <option value="android">Android</option>
-            </select>
-            <select
-              value={releaseType}
-              onChange={(e) => setReleaseType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white w-full sm:max-w-xs"
-            >
-              <option value="">Release Type</option>
-              <option value="Alpha">Alpha</option>
-              <option value="Beta">Beta</option>
-              <option value="Enterprise">Enterprise</option>
-              <option value="Production">Production</option>
-              <option value="Store">Store</option>
-            </select>
-            <select
-              value={selectedPlatform}
-              onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white w-full sm:max-w-xs"
-            >
-              <option value="">Select Platform</option>
-              <option value="java">Java</option>
-              <option value="kotlin">Kotlin</option>
-              <option value="react-native">React Native</option>
-            </select>
           </div>
         </div>
 
@@ -278,7 +261,7 @@ const Dashboard = () => {
                     </td>
                     <td className="px-4 py-2 border-b border-gray-300">
                       <button
-                        onClick={() => handleDeleteApp(app._id)} // Pass app._id to handleDeleteApp
+                        onClick={() => openDeleteModal(app)} // Pass app._id to handleDeleteApp
                         className="text-black hover:text-red-700"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -440,6 +423,22 @@ const Dashboard = () => {
       {toastVisible && (
         <div className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-black text-white p-4 rounded-md shadow-lg">
           {toastMessage}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold">Are you sure?</h3>
+            <p className="mt-2">Do you want to delete this app?</p>
+            <div className="mt-4 flex justify-between">
+              <Button onClick={closeDeleteModal}>Cancel</Button>
+              <Button onClick={handleDeleteApp} className="bg-red-500">
+                Confirm
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
