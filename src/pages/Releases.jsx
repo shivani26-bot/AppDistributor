@@ -192,12 +192,15 @@ const Releases = () => {
 
   const form = useForm({
     resolver: zodResolver(uploadReleaseSchema),
+
     defaultValues: {
       // file: "",
       version: "",
       releaseNote: "",
     },
   });
+
+  const { reset } = form;
 
   useEffect(() => {
     if (accessToken) {
@@ -238,6 +241,10 @@ const Releases = () => {
             notifyReleaseSuccess();
             triggerFetchData();
             dispatch(clearBuildUrlData());
+            reset({
+              version: "",
+              releaseNote: "",
+            }); //resets the version and release note fields
           }
         }
       });
@@ -429,9 +436,19 @@ const Releases = () => {
                     {/* <SheetFooter> */}
                     {/* <SheetClose asChild> */}
                     {/* <BeatLoader /> */}
-                    <Button type="submit" className="w-full">
+
+                    <Button
+                      type="submit"
+                      disabled={
+                        !buildUrlData?.data ||
+                        !form.watch("version") ||
+                        !form.watch("releaseNote")
+                      }
+                      className="w-full"
+                    >
                       Upload
                     </Button>
+
                     {/* </SheetClose> */}
                     {/* </SheetFooter> */}
 

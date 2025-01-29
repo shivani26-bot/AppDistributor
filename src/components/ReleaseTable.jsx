@@ -127,7 +127,7 @@ const ReleaseTable = ({ releases, appId }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Release ↓</TableHead>
+            <TableHead className="w-[350px]">Release ↓</TableHead>
             <TableHead>Version</TableHead>
             {/* <TableHead>File Extension</TableHead> */}
             {/* <TableHead className="text-right">Amount</TableHead> */}
