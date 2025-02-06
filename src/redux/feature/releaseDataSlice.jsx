@@ -6,7 +6,9 @@ export const postReleaseData = createAsyncThunk(
   async (releaseData) => {
     try {
       console.log("releaseData", releaseData);
-      const { build, version, releaseNote, appId } = releaseData;
+      const { build, version, releaseNote, appId, fileSize, fileExtension } =
+        releaseData;
+      console.log("fileSize", fileSize);
       console.log("appId", appId);
       const accessToken = Cookies.get("accessToken");
 
@@ -30,6 +32,8 @@ export const postReleaseData = createAsyncThunk(
             version,
             releaseNote,
             applicationId: appId,
+            fileSize,
+            fileExtension,
           }),
         }
       );

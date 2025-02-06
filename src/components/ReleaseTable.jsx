@@ -79,12 +79,12 @@ const ReleaseTable = ({ releases, appId }) => {
 
   const pageSize = 4; // Set a fixed page size of 5
   const [pageIndex, setPageIndex] = useState(0); // Track current page index
-  // const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(null);
   const startIndex = pageIndex * pageSize;
   const currentReleases = releases.slice(startIndex, startIndex + pageSize);
-
+  // const [isImageVisible, setIsImageVisible] = useState(true);
   const handleNextPage = () => {
     if (startIndex + pageSize < releases.length) {
       setPageIndex((prev) => prev + 1);
@@ -96,12 +96,13 @@ const ReleaseTable = ({ releases, appId }) => {
       setPageIndex((prev) => prev - 1);
     }
   };
-  // const handleViewDetails = () => {
-  //   setShowDetails(true); // Show the component
-  // };
-  // const handleCloseDrawer = () => {
-  //   setShowDetails(false); // Close the drawer
-  // };
+  const handleViewDetails = () => {
+    setShowDetails(true); // Show the component
+    // setIsImageVisible(false);
+  };
+  const handleCloseDrawer = () => {
+    setShowDetails(false); // Close the drawer
+  };
   const handleDelete = () => {
     setShowDeleteModal(true); // Show the delete modal
   };
@@ -116,10 +117,13 @@ const ReleaseTable = ({ releases, appId }) => {
   };
 
   const handleDownload = (url) => {
+    console.log("download url", url);
     const link = document.createElement("a");
     link.href = url;
+    console.log(url.split("/"));
+    console.log(url.split("/").pop());
     link.download = url.split("/").pop();
-    link.click();
+    link.click(); //simulates a click event on the anchor element, which triggers the download
   };
 
   return (
@@ -167,7 +171,7 @@ const ReleaseTable = ({ releases, appId }) => {
                     onClick={handleDelete}
                   />
                 </button>
-                {/* <button
+                <button
                   className="w-8 h-8 mr-2 cursor-pointer bg-transparent border-none"
                   title="View Details"
                   onClick={handleViewDetails}
@@ -177,8 +181,14 @@ const ReleaseTable = ({ releases, appId }) => {
                     src="/public/search.png"
                     alt="View Details"
                   />
-                </button> */}
-                {/* {showDetails && <ReleaseDetails onClose={handleCloseDrawer} />} */}
+                </button>
+                {showDetails && (
+                  <ReleaseDetails
+                    onClose={handleCloseDrawer}
+                    release={release}
+                  />
+                )}
+                {/* {showDetails && <ReleaseDetails />} */}
 
                 {showDeleteModal && (
                   <DeleteModal

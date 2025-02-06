@@ -115,6 +115,7 @@ const Releases = () => {
   console.log(appName, appId);
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState("");
+  const [fileExtension, setFileExtension] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const accessToken = Cookies.get("accessToken");
@@ -232,6 +233,8 @@ const Releases = () => {
           version,
           releaseNote,
           appId,
+          fileSize,
+          fileExtension,
         })
       ).then((response) => {
         {
@@ -261,8 +264,10 @@ const Releases = () => {
 
     if (file) {
       const fileExtension = file.name.split(".").pop().toLowerCase();
+
       setFileName(file.name);
       setFileSize(fileSize);
+      setFileExtension(fileExtension);
 
       setError("");
       if (

@@ -14,19 +14,47 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { useNavigate, useParams } from "react-router-dom";
 
-const ReleaseDetails = ({ onClose }) => {
+const ReleaseDetails = ({ onClose, release }) => {
   // const ReleaseDetails = () => {
+  const [copy, setCopy] = React.useState(false);
+  const handleCopy = () => {
+    // This copies the release.build URL to the clipboard.
+    // The writeText() method returns a promise, so we handle success and failure using .then() and .catch().
+    navigator.clipboard
+      .writeText(release.build)
+      .then(() => {
+        setCopy(true);
+        setTimeout(() => setCopy(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Error copying text: ", err);
+      });
+  };
   return (
     <Drawer open={true}>
-      {/* <Drawer> */}
-      {/* <DrawerTrigger asChild>
+      {/* <Drawer>
+      <DrawerTrigger asChild>
         <Button variant="outline">Open Drawer</Button>
+        <button
+          className="w-8 h-8 mr-2 cursor-pointer bg-transparent border-none"
+          title="View Details"
+         
+        >
+          <img
+            className="w-full h-full"
+            src="/public/search.png"
+            alt="View Details"
+          />
+        </button>
       </DrawerTrigger> */}
       <DrawerContent>
         <div className="  mx-auto w-full ">
           <DrawerHeader>
-            <DrawerTitle className="text-2xl">Release Id</DrawerTitle>
+            <DrawerTitle className="text-2xl">
+              Release Id:&nbsp; &nbsp;{release.buildNumber}
+            </DrawerTitle>
             {/* <DrawerDescription>Set your daily activity goal.</DrawerDescription> */}
           </DrawerHeader>
           <div className="p-4 pb-0">
@@ -38,12 +66,35 @@ const ReleaseDetails = ({ onClose }) => {
             <div className="mt-3 h-[120px]">
               {" "}
               <div className="flex justify-between items-center p-2 mr-8 ml-8 mb-2 ">
-                <p>Version: 1.0.0 </p>
-                <p> Release Notes: This is first Release</p>
+                <p>Version:&nbsp; &nbsp;{release.version} </p>
+                <p> Release Notes:&nbsp; &nbsp;{release.releaseNote}</p>
               </div>
               <div className="flex justify-between items-center p-2 mr-8 ml-8">
-                <p>Size: 1.2MB</p>
-                <p>FileExtension: .apk</p>
+                {/* <p>
+                  Size:{" "}
+                  {fileSize !== null
+                    ? `${(fileSize ).toFixed(2)} MB`
+                    : "Loading..."}
+                </p> */}
+
+                <p>Size: &nbsp; &nbsp;{release.fileSize} MB</p>
+                <p>File Extension:&nbsp; &nbsp;{release.fileExtension}</p>
+              </div>
+              <div className="flex  justify-between items-center p-2 mr-8 ml-8 mb-2 ">
+                <div className="flex   items-center">
+                  <p className="mr-2">
+                    Download Url: &nbsp; &nbsp;
+                    <a className="text-blue-500 underline" href={release.build}>
+                      {release.build}{" "}
+                    </a>
+                  </p>
+
+                  <button title={copy ? "Copied" : "Copy"} onClick={handleCopy}>
+                    <img className="w-5 h-5 " src="/public/copyIcon.png" />
+                  </button>
+                </div>
+                <p>File Name:&nbsp; &nbsp;{release.build.split("/").pop()}</p>
+                {/* <p> Release Notes: {release.releaseNote}</p> */}
               </div>
             </div>
           </div>
@@ -59,6 +110,7 @@ const ReleaseDetails = ({ onClose }) => {
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
+              <Button onClick={onClose}>Close</Button>
             </DrawerClose> */}
           </DrawerFooter>
           {/* <DrawerFooter>
